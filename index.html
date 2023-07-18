@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>html-javascript-task</title>
+    <!--    <link href="/index.css" rel="stylesheet" type="text/css" />-->
+  </head>
+  <body>
+    <div
+      id="container"
+      style="width: 80vw; margin: auto; display: flex; flex-wrap: wrap"
+    ></div>
+
+    <!--    <script type="application/javascript" src="index.js"></script>-->
+    <script type="application/javascript">
+      const divArr = setStartedElements();
+      const container = document.querySelector("#container");
+      container.append(...divArr);
+      container.addEventListener("click", replaceItem);
+
+      const movedItems = [];
+
+      function createDiv() {
+        const div = document.createElement("div");
+        div.style.display = "flex";
+        div.style.justifyContent = "center";
+        div.style.alignItems = "center";
+        div.style.width = "80px";
+        div.style.height = "100px";
+        div.style.backgroundColor = "#0b59ce";
+        div.style.textAlign = "center";
+        div.style.border = "2px solid #fff";
+        div.style.fontWeight = "bold";
+        div.style.color = "#c9c32a";
+        div.style.cursor = "pointer";
+        div.setAttribute(
+          "onmouseover",
+          "this.style.backgroundColor = '#861C1CFF';"
+        );
+        div.setAttribute(
+          "onmouseout",
+          "this.style.backgroundColor = '#0b59ce';"
+        );
+
+        return div;
+      }
+
+      function setStartedElements() {
+        const items = [];
+        for (let i = 0; i < 100; i++) {
+          const div = createDiv();
+          const itemId = `${i + 1}`;
+          div.innerHTML = `<div>div ${itemId}</div>`;
+          div.dataset.id = itemId;
+
+          items.push(div);
+        }
+        return items;
+      }
+
+      function replaceItem(e) {
+        const targetElement = !e.target.dataset.id
+          ? e.target.parentElement
+          : e.target;
+
+        const isNotItem = !targetElement.dataset.id;
+        const isFirstItem =
+          !movedItems.length && targetElement.dataset.id === "1";
+
+        if (isNotItem || isFirstItem) {
+          return;
+        }
+
+        const div = createDiv();
+        div.innerHTML = `<div>div ${targetElement.dataset.id}</div>`;
+        div.dataset.id = targetElement.dataset.id;
+
+        const alreadyMovedItem = movedItems.find(
+          (i) => i === targetElement.dataset.id
+        );
+
+        if (alreadyMovedItem) {
+          let beforeItem;
+
+          let i = container.childNodes.length;
+          while (i > 1 && !beforeItem) {
+            if (
+              container.childNodes[i - 1].dataset.id <
+              Number(targetElement.dataset.id)
+            ) {
+              beforeItem = container.childNodes[i - 1];
+            }
+            i--;
+          }
+
+          if (beforeItem) {
+            beforeItem.after(div);
+            targetElement.remove();
+          }
+
+          movedItems.splice(
+            movedItems.findIndex((i) => i === alreadyMovedItem),
+            1
+          );
+          return;
+        }
+
+        movedItems.push(targetElement.dataset.id);
+        container.prepend(div);
+        targetElement.remove();
+      }
+    </script>
+  </body>
+</html>
