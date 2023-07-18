@@ -13,13 +13,17 @@
 
     <!--    <script type="application/javascript" src="index.js"></script>-->
     <script type="application/javascript">
+      /* List of created elements */
       const divArr = setStartedElements();
+      /* The link to the main container of divs */
       const container = document.querySelector("#container");
       container.append(...divArr);
       container.addEventListener("click", replaceItem);
 
+      /* Id's list of moved items */
       const movedItems = [];
 
+      /* The function of div template makes the item (div) */
       function createDiv() {
         const div = document.createElement("div");
         div.style.display = "flex";
@@ -45,6 +49,7 @@
         return div;
       }
 
+      /* The function creates default list of items */
       function setStartedElements() {
         const items = [];
         for (let i = 0; i < 100; i++) {
@@ -58,11 +63,14 @@
         return items;
       }
 
+      /* Callback function of the EventListener */
       function replaceItem(e) {
+        /* Filter of the elements that can be active */
         const targetElement = !e.target.dataset.id
           ? e.target.parentElement
           : e.target;
 
+        /* Wrong conditions */
         const isNotItem = !targetElement.dataset.id;
         const isFirstItem =
           !movedItems.length && targetElement.dataset.id === "1";
@@ -71,23 +79,28 @@
           return;
         }
 
+        /* Create a new item instead an old item */
         const div = createDiv();
         div.innerHTML = `<div>div ${targetElement.dataset.id}</div>`;
         div.dataset.id = targetElement.dataset.id;
 
+        /* Check for the item was moved */
         const alreadyMovedItem = movedItems.find(
           (i) => i === targetElement.dataset.id
         );
 
+        /* If click was on the moved item we have to move it on default place */
         if (alreadyMovedItem) {
           let beforeItem;
-
           let i = container.childNodes.length;
+
+          /* Look for last item before the target index */
           while (i > 1 && !beforeItem) {
-            if (
+            const lastItemBeforeTarget =
               container.childNodes[i - 1].dataset.id <
-              Number(targetElement.dataset.id)
-            ) {
+              Number(targetElement.dataset.id);
+
+            if (lastItemBeforeTarget) {
               beforeItem = container.childNodes[i - 1];
             }
             i--;
@@ -98,6 +111,7 @@
             targetElement.remove();
           }
 
+          /* Remove item of id's list */
           movedItems.splice(
             movedItems.findIndex((i) => i === alreadyMovedItem),
             1
@@ -105,6 +119,7 @@
           return;
         }
 
+        /* If an item was not moved before */
         movedItems.push(targetElement.dataset.id);
         container.prepend(div);
         targetElement.remove();
